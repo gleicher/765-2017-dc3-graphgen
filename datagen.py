@@ -176,3 +176,18 @@ def genExamples():
                       ("3 part 1", randomNet(6, 1500, 2)),
                       ("3 part 2", shuffleMatrix(randomNet(6, 1500, 3))),
                   ])
+
+def genPartExamples():
+    def genPartLevels(size,nlinks,nparts=[3],probs=[1,.8,.5,.2], repeats=1):
+        mats = []
+        for n in nparts:
+            for p in probs:
+                mats.append(("N({:d}) P({}) - 0".format(n,p), randomNet(size, nlinks, n, p)))
+                for r in range(repeats):
+                    mats.append(("N({:d}) P({}) - {:d}".format(n,p,r+1), shuffleMatrix(randomNet(size, nlinks, n, p))))
+        return mats
+
+    writeMatrices("Examples/5-partitioned-9-wt.txt", genPartLevels(9,2500,nparts=[3],repeats=1))
+    writeMatrices("Examples/6-partitioned-12-wt.txt",genPartLevels(12,3200,nparts=[3,4],repeats=1))
+    writeMatrices("Examples/7-paritions-9.txt",genPartLevels(9,2500,nparts=[2,3],probs=[.2,.7]))
+    writeMatrices("Examples/7-paritions-12.txt",genPartLevels(12,3500,nparts=[3,4],probs=[.2,.7]))
