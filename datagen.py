@@ -120,6 +120,20 @@ def partitionOf(node, msize, partitions):
 # either give a size, or a list of weights
 def randomNet(spec:Union[int,List[float]], nmessages:int,
               partitions:int=0, partitionProb:float=.8):
+    """
+    This is the function that actually generates a random network (the matrix of message counts)
+
+    :param spec: the size of the matrix - either an integer, or a list of weights.
+        If an integer is given, it is the number of nodes, given equal weight.
+        If a list is given, the length is the number of nodes, and the values are the weights for the distribution of sending.
+    :param nmessages:  the total number of messages
+    :param partitions: the number of partitions in the network - use 0 for a whole partition (1 should do the same thing)
+    :param partitionProb: the probability of a message being sent within the partition.
+        If 1, all messages are within the partitions (the matrix will be block diagonal).
+        If a message is not designated as within the partition, it still may end up going to
+        a member of the partition.
+    :return: the nxn matrix of counts
+    """
     ## setup weights and size
     try:
         # if this is an integer, then make up the weights
