@@ -27,7 +27,7 @@ def writeMatrices(filename : str, data : List[Union[numpy.ndarray,Tuple]]):
     with open(filename,"w") as fo:
         for i,md in enumerate(data):
             mat = md[1] if type(md)==tuple else md
-            size = len(md)
+            size = len(mat)
             name = md[0] if type(md)==tuple else "Group {}".format(i)
             names = md[2] if type(md)==tuple and len(md)>2 else ["{:c}".format(j+65) for j in range(size)]
             fo.write("{} {}\n".format(size,name))
@@ -93,8 +93,17 @@ def shuffleMatrix(mat : numpy.ndarray, permutation : List=[]):
             result[i,j] = mat[permutation[i],permutation[j]]
     return result
 
-# helper function - which 
+# helper function - which is used by randomNet
+# figure out which partition a node is in
 def partitionOf(node, msize, partitions):
+    """
+    figure out which partition a node is in - returns the beginning and end of the partition
+    useful in randomNet
+    :param node:
+    :param msize:
+    :param partitions:
+    :return:
+    """
     # naively make equal size partitions - and one big one at the end
     psize = int(msize/partitions)
     pindex = int(node/psize)
@@ -110,7 +119,7 @@ def partitionOf(node, msize, partitions):
 # generate a purely random communication network
 # either give a size, or a list of weights
 def randomNet(spec:Union[int,List[float]], nmessages:int,
-              partitions:int=0, partitionProb:float=.5):
+              partitions:int=0, partitionProb:float=.8):
     ## setup weights and size
     try:
         # if this is an integer, then make up the weights
@@ -122,23 +131,48 @@ def randomNet(spec:Union[int,List[float]], nmessages:int,
         msize = len(spec)
     ## actually create the matrix by sampling
     mat = numpy.zeros( (msize,msize) )
+    # generate the from nodes randomly
     for fr in random.choices([i for i in range(msize)],weights=weights,k=nmessages):
-        # if we're partitioned, only pick a "to" in the same partition (in random case)
-        if partitions>0 and random.random()>partitionProb:
+        # pick a "to" node by finding the range that the node can be in
+        # (pi to pe, inclusive) - this allows us to do partitioning
+        if partitions>0 and random.random()<partitionProb:
             pi,pe = partitionOf(fr,msize,partitions)
         else:
             pi,pe = 0,msize-1
-        # make sure that to is not the same as from
+        # make sure that to is not the same as from - shrink the partition and stretch it
+        # around from
         to = random.randint(pi,pe-1)
         if to>=fr: to += 1
         mat[fr,to] += 1
     return mat
 
-
-# a random net that is a little "cliquy"
-# random process - but a higher chance that a message is within a clique
-
-
 # a random net that is "hierarchical"
 # each node has a list of children - 3 types of messages (random, downstream, upstream)
 
+### generate the example files
+def genExamples():
+    writeMatrices("Examples/1-simplest-6x6.txt",
+                  [("Random 1",randomNet(6,1000)),
+                   ("Random 2",randomNet(6,1500)),
+                   ("Random 3",randomNet(6,2000))])
+    writeMatrices("Examples/2-weighted-6x6.txt",
+                  [("Weighted 1", randomNet([10, 1, 1, 1, 1, 1], 1000)),
+                   ("Weighted 2", randomNet([10,10, 1, 1, 1, 1], 1500)),
+                   ("Weighted 3", randomNet([10,10,10, 1, 1, 1], 1500))
+                  ])
+    writeMatrices("Examples/3-varied-67.txt",
+                  [("Unweighted 6", randomNet([ 1, 1, 1, 1, 1, 1], 1500)),
+                   ("Weighted 6-1", randomNet([10,10, 1, 1, 1, 1], 1500)),
+                   ("Weighted 6-2", randomNet([ 1, 1,10, 1,10, 1], 1500)),
+                   ("Unweighted 7", randomNet([1, 1, 1, 1, 1, 1, 1], 1500)),
+                   ("Weighted 6-1", randomNet([1,10,10, 1, 1, 1, 1], 1500)),
+                   ("Weighted 6-2", randomNet([1, 1, 1,10, 1,10, 1], 1500)),
+                  ])
+    writeMatrices("Examples/4-partitioned-6.txt",
+                  [
+                      ("Non Part", randomNet(6,1500)),
+                      ("2 part 1", randomNet(6,1500,2)),
+                      ("2 part 2", shuffleMatrix(randomNet(6,1500,3))),
+                      ("3 part 1", randomNet(6, 1500, 2)),
+                      ("3 part 2", shuffleMatrix(randomNet(6, 1500, 3))),
+                  ])
