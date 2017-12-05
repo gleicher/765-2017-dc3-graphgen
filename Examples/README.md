@@ -10,4 +10,4 @@ All these matrices are generated using the sample code.
 The "partitioned" networks have strong subgroups (most messages stay within the subgroups).
 For the examples (5-7, although 7 is duplicated), each matrix is described with 2 numbers:
 n (the number of partitions) and p (the probability that a message stays within the partition vs. being to any other node).
-
+A third number distinguishes between repeats of the same pattern.
