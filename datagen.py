@@ -160,21 +160,48 @@ def randomNet(spec:Union[int,List[float]], nmessages:int,
         mat[fr,to] += 1
     return mat
 
+def addChain(matOrInt : Union[numpy.ndarray,int],
+             forward=(50,70),backwards=(10,20),
+             scramble=True):
+    """
+    Adds a "chain" (a link where person 1 sends to 2, 2 sends to 3, ...) to a network
+    Either pass it a network (it adds to it), or an integer (creates a zero network)
+
+    :param matOrInt: matrix to add to, or integer for matrix size
+    :param forward: range of messages to add in the forward direction
+    :param backwards: range of messages to ad in the reverse direction
+    :param scramble: do a random order
+    :return: the matrix passed in (or a new one, if an int was passed in)
+    """
+    if type(matOrInt) == int:
+        matOrInt = numpy.zeros((matOrInt,matOrInt))
+    size = len(matOrInt)
+    index = [i for i in range(size)]
+    if scramble:
+        random.shuffle(index)
+    for i in range(size-1):
+        fr = index[i]
+        to = index[i+1]
+        matOrInt[fr,to] += random.randint(forward[0],forward[1])
+        matOrInt[to,fr] += random.randint(backwards[0],backwards[1])
+    return matOrInt
+
+
 # a random net that is "hierarchical"
 # each node has a list of children - 3 types of messages (random, downstream, upstream)
 
 ### generate the example files
 def genExamples():
-    writeMatrices("Examples/1-simplest-6x6.txt",
+    writeMatrices("Examples/01-simplest-6x6.txt",
                   [("Random 1",randomNet(6,1000)),
                    ("Random 2",randomNet(6,1500)),
                    ("Random 3",randomNet(6,2000))])
-    writeMatrices("Examples/2-weighted-6x6.txt",
+    writeMatrices("Examples/02-weighted-6x6.txt",
                   [("Weighted 1", randomNet([10, 1, 1, 1, 1, 1], 1000)),
                    ("Weighted 2", randomNet([10,10, 1, 1, 1, 1], 1500)),
                    ("Weighted 3", randomNet([10,10,10, 1, 1, 1], 1500))
                   ])
-    writeMatrices("Examples/3-varied-67.txt",
+    writeMatrices("Examples/03-varied-67.txt",
                   [("Unweighted 6", randomNet([ 1, 1, 1, 1, 1, 1], 1500)),
                    ("Weighted 6-1", randomNet([10,10, 1, 1, 1, 1], 1500)),
                    ("Weighted 6-2", randomNet([ 1, 1,10, 1,10, 1], 1500)),
@@ -182,7 +209,7 @@ def genExamples():
                    ("Weighted 6-1", randomNet([1,10,10, 1, 1, 1, 1], 1500)),
                    ("Weighted 6-2", randomNet([1, 1, 1,10, 1,10, 1], 1500)),
                   ])
-    writeMatrices("Examples/4-partitioned-6.txt",
+    writeMatrices("Examples/04-partitioned-6.txt",
                   [
                       ("Non Part", randomNet(6,1500)),
                       ("2 part 1", randomNet(6,1500,2)),
@@ -201,7 +228,7 @@ def genPartExamples():
                     mats.append(("N({:d}) P({}) - {:d}".format(n,p,r+1), shuffleMatrix(randomNet(size, nlinks, n, p))))
         return mats
 
-    writeMatrices("Examples/5-partitioned-9-wt.txt", genPartLevels(9,2500,nparts=[3],repeats=1))
-    writeMatrices("Examples/6-partitioned-12-wt.txt",genPartLevels(12,3200,nparts=[3,4],repeats=1))
-    writeMatrices("Examples/7-paritions-9.txt",genPartLevels(9,2500,nparts=[2,3],probs=[.2,.7]))
-    writeMatrices("Examples/7-paritions-12.txt",genPartLevels(12,3500,nparts=[3,4],probs=[.2,.7]))
+    writeMatrices("Examples/05-partitioned-9-wt.txt", genPartLevels(9,2500,nparts=[3],repeats=1))
+    writeMatrices("Examples/06-partitioned-12-wt.txt",genPartLevels(12,3200,nparts=[3,4],repeats=1))
+    writeMatrices("Examples/07-paritions-9.txt",genPartLevels(9,2500,nparts=[2,3],probs=[.2,.7]))
+    writeMatrices("Examples/08-paritions-12.txt",genPartLevels(12,3500,nparts=[3,4],probs=[.2,.7]))
