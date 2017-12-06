@@ -11,3 +11,6 @@ The "partitioned" networks have strong subgroups (most messages stay within the 
 For the examples (5-7, although 7 is duplicated), each matrix is described with 2 numbers:
 n (the number of partitions) and p (the probability that a message stays within the partition vs. being to any other node).
 A third number distinguishes between repeats of the same pattern.
+
+The "chain" networks have a message chain (A sends messages to B, B to C, etc.).
+This gives another pattern to mix in so you have something to find/compare.

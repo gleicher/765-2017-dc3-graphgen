@@ -28,4 +28,7 @@ To simulate "partitioned" networks, the choice of recipient can be conditioned o
 If the network is partitioned, with some probability, the sender will choose a recipient in their partition
 (otherwise they will choose randomly from all others, which may or may not be someone in their partition).
 
+A message "chain" can be added (where person A sends to B sends to C) - to give another
+pattern to spot / compare. 
+
 In the future, other effects (like hierarchies) may be modeled.
