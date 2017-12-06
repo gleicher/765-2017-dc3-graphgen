@@ -161,7 +161,7 @@ def randomNet(spec:Union[int,List[float]], nmessages:int,
     return mat
 
 def addChain(matOrInt : Union[numpy.ndarray,int],
-             forward=(50,70),backwards=(10,20),
+             forward=(50,70),backwards=(30,40),
              scramble=True):
     """
     Adds a "chain" (a link where person 1 sends to 2, 2 sends to 3, ...) to a network
@@ -232,3 +232,39 @@ def genPartExamples():
     writeMatrices("Examples/06-partitioned-12-wt.txt",genPartLevels(12,3200,nparts=[3,4],repeats=1))
     writeMatrices("Examples/07-paritions-9.txt",genPartLevels(9,2500,nparts=[2,3],probs=[.2,.7]))
     writeMatrices("Examples/08-paritions-12.txt",genPartLevels(12,3500,nparts=[3,4],probs=[.2,.7]))
+
+def genChainExamples():
+    writeMatrices("Examples/11-chains-simple7s.txt",
+                  [
+                      ("chain 7 - not scrambled", addChain(7,scramble=False)),
+                      ("chain 7", addChain(7)),
+                      ("another chain 7",addChain(7)),
+                      ("chain 7 over noise - not scrambled", addChain(randomNet(7,700),scramble=False)),
+                      ("chain 7 over noise", addChain(randomNet(7, 700))),
+                      ("another chain 7 over noise", addChain(randomNet(7, 700)))
+                  ])
+    writeMatrices("Examples/12-chain-partition-7.txt",
+                  [
+                      ("chain + partition - clean",addChain(randomNet(7,700,2,1),scramble=False)),
+                      ("chain + partition - clean+scramble",shuffleMatrix(addChain(randomNet(7,700,2,1)))),
+                      ("chain + partition - scrambled chain",
+                        addChain(randomNet(7,700,2,1))),
+                      ("chain + partition - scrambled both",
+                        addChain(shuffleMatrix(randomNet(7,700,2,1)))),
+                      ("chain + partition - mixed",
+                       addChain(shuffleMatrix(randomNet(7, 700, 2, .7)))),
+                      ("chain + partition - mixed",
+                       addChain(shuffleMatrix(randomNet(7, 700, 2, .7))))
+                  ])
+    writeMatrices("Examples/13-chain-partition-varied.txt",
+                  [
+                      ("one", addChain(randomNet(9,1400,2,.7))),
+                      ("two", addChain(randomNet(9,1400, 2, .5))),
+                      ("three", addChain(randomNet(9, 1400, 3, .7))),
+                      ("four", addChain(randomNet(9, 1400, 3, .5))),
+                      ("one", addChain(randomNet(8, 1200, 2, .7))),
+                      ("two", addChain(randomNet(8, 1200, 2, .5))),
+                      ("three", addChain(randomNet(8, 1200, 3, .7))),
+                      ("four", addChain(randomNet(8, 1200, 3, .5))),
+
+                  ])
