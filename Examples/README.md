@@ -6,7 +6,7 @@ This is example outputs from the random data generator. It is provided in case y
 Each file contains a set of networks you can use for testing. They are numbered in a rough order of challenging-ness.
 
 Note: the nodes in each network are meant to be different (e.g., the "A" node in network 1 is not the same "A" as in
-network 2). In future versions, I'll name each node separately.
+network 2). Nodes within a file should all have unique names (but if they don't, assume that each network is different).
 
 All these matrices are generated using the sample code.
 
