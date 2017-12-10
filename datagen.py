@@ -23,13 +23,17 @@ from typing import List,Union,Tuple
 # (1) just matrices
 # (2) tuples of (name,matrix, (optional) node names)
 # if name or node names aren't provided they are given the default values
+def nameMaker(num:int):
+    return "{:c}{:c}".format(65+int(num/26),65+int(num%26),num)
 def writeMatrices(filename : str, data : List[Union[numpy.ndarray,Tuple]]):
     with open(filename,"w") as fo:
+        gcount = 0
         for i,md in enumerate(data):
             mat = md[1] if type(md)==tuple else md
             size = len(mat)
             name = md[0] if type(md)==tuple else "Group {}".format(i)
-            names = md[2] if type(md)==tuple and len(md)>2 else ["{:c}".format(j+65) for j in range(size)]
+            names = md[2] if type(md)==tuple and len(md)>2 else [nameMaker(j+gcount) for j in range(size)]
+            gcount += size
             fo.write("{} {}\n".format(size,name))
             for t in zip(names,mat):
                 string = t[0]
